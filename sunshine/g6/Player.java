@@ -291,7 +291,7 @@ public class Player implements sunshine.sim.Player {
         farBalePoints = new ArrayList<Point>();
         int index = 0;
         for (Point p : balePointsSorted.keySet()) {
-            if (balePointsSorted.get(p) > 300) {
+            if (balePointsSorted.get(p) > 100) {
                 break;
             }
             index+=1;
@@ -428,6 +428,10 @@ public class Player implements sunshine.sim.Player {
                     p = closeBales.remove(randNum);
                     bales.remove(randNum);
                     return Command.createMoveCommand(p);
+                }
+                if (closeBales.size() == 0) {
+                    tractor_mode.put(id,9);
+                    return new Command(CommandType.UNSTACK);
                 }
                 else {
                     return null;

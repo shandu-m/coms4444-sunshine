@@ -291,7 +291,7 @@ public class Player implements sunshine.sim.Player {
         farBalePoints = new ArrayList<Point>();
         int index = 0;
         for (Point p : balePointsSorted.keySet()) {
-            if (balePointsSorted.get(p) > 50) {
+            if (balePointsSorted.get(p) > 300) {
                 break;
             }
             index+=1;
@@ -418,6 +418,10 @@ public class Player implements sunshine.sim.Player {
             // at 0,0, away_tractor with trailer ready to go do task
             case 1:
             if (close_tractor.contains(id)) {
+                if (tractor.getAttachedTrailer() != null) {
+                    tractor_mode.put(id,1);
+                    return new Command(CommandType.DETATCH);
+                }
                 tractor_mode.put(id,7);
                 if (closeBales.size() > 0) {
                     randNum = closeBales.size() - 1;

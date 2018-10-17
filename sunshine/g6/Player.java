@@ -290,9 +290,13 @@ public class Player implements sunshine.sim.Player {
 
         farBalePoints = new ArrayList<Point>();
         int index = 0;
-        int radius = 250;
-        if (m==1000){
-            radius = 280;
+        int radius = 280;
+        if (m == 700) {
+            radius = 250;
+        } else if (m == 200) {
+            radius = 210;
+        } else if (m == 400) {
+            radius = 310;
         }
         for (Point p : balePointsSorted.keySet()) {
             if (balePointsSorted.get(p) > radius) {
@@ -491,14 +495,14 @@ public class Player implements sunshine.sim.Player {
             case 5:
             tractor_mode.put(id,6);
             // System.out.println("checking if tractor " + id + " has bale at case 5: " + tractor.getHasBale());
-            System.out.println("case 5 id: " + (dropPointPerTractor.get(id)));
+            // System.out.println("case 5 id: " + (dropPointPerTractor.get(id)));
 
-            System.out.println("all keys in balesPerLocation");
-            for (Map.Entry<Integer, Boolean> entry : segmentVisited.entrySet()) {
-                Integer key = entry.getKey();
-                Boolean value = entry.getValue();
-                System.out.println("segment no:" + key + " - " + value);
-            }
+            // System.out.println("all keys in balesPerLocation");
+            // for (Map.Entry<Integer, Boolean> entry : segmentVisited.entrySet()) {
+            //     Integer key = entry.getKey();
+            //     Boolean value = entry.getValue();
+            //     System.out.println("segment no:" + key + " - " + value);
+            // }
 
             balesPerLocation.put(dropPointPerTractor.get(id), balesPerLocation.get(dropPointPerTractor.get(id))+1);    
             return new Command(CommandType.STACK);    
@@ -550,8 +554,8 @@ public class Player implements sunshine.sim.Player {
             case 10:
             if (balesPerLocation.get(dropPointPerTractor.get(id)) > 0) {
                 tractor_mode.put(id, 11);
-                System.out.println("secondBatchStart value in case 10: " + secondBatchStart);
-                System.out.println("dropPointPerTractor.get(id) value in case 10: " + (dropPointPerTractor.get(id)));
+                // System.out.println("secondBatchStart value in case 10: " + secondBatchStart);
+                // System.out.println("dropPointPerTractor.get(id) value in case 10: " + (dropPointPerTractor.get(id)));
                 balesPerLocation.put(dropPointPerTractor.get(id), balesPerLocation.get(dropPointPerTractor.get(id)) - 1);
                 return new Command(CommandType.UNSTACK);
             }

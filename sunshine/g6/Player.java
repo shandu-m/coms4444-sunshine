@@ -103,7 +103,7 @@ public class Player implements sunshine.sim.Player {
                 counter++;
             }
         }
-        System.out.println("scan_zones.size() = " + scan_zones.size());
+        //System.out.println("scan_zones.size() = " + scan_zones.size());
         ArrayList<List<Point>> scan_zones_copy = (ArrayList<List<Point>>)(scan_zones.clone());
         scan_zones.clear();
         for (List<Point> lp : scan_zones_copy) {
@@ -114,9 +114,9 @@ public class Player implements sunshine.sim.Player {
         for (List<Point> lp : scan_zones) {
             total += lp.size();
         }
-        System.out.println("!!! " + total);
+        //System.out.println("!!! " + total);
 
-        System.out.println("partitioned point count is " + counter);
+        //System.out.println("partitioned point count is " + counter);
 
 
     }
@@ -183,7 +183,7 @@ public class Player implements sunshine.sim.Player {
                 }
                 //System.out.println();
             }
-                System.out.println("Points printed are " + count);
+                //System.out.println("Points printed are " + count);
             
     }
 
@@ -279,14 +279,14 @@ public class Player implements sunshine.sim.Player {
         //System.out.println("balePointsSorted: " + balePointsSorted); //
 
 
-        // #############################################
-        // # Divide the grid into pizza slice segments #
-        // #############################################
+        // ###################
+        // # Divide the grid #
+        // ###################
 
         // divide into segments according to how many bales there are outside of 300m radius
 
         int num_bales = bales.size();
-        System.out.println("num_bales = " + num_bales);
+        //System.out.println("num_bales = " + num_bales);
 
         farBalePoints = new ArrayList<Point>();
         int index = 0;
@@ -305,24 +305,24 @@ public class Player implements sunshine.sim.Player {
             index+=1;
         }
         int numFarBales = num_bales - index;
-        System.out.println("old index = " + index);
-        System.out.println("numFarBales (before) = " + numFarBales);
+        //System.out.println("old index = " + index);
+        //System.out.println("numFarBales (before) = " + numFarBales);
 
         if (numFarBales % 11 != 0) {
             index = index + (numFarBales % 11);
         }
         numFarBales = num_bales - index;
-        System.out.println("new index = " + index);
-        System.out.println("numFarBales = " + numFarBales);
+        //System.out.println("new index = " + index);
+        //System.out.println("numFarBales = " + numFarBales);
 
         double num_segs = numFarBales/11;
-        System.out.println("num_segs = " + num_segs);
+        //System.out.println("num_segs = " + num_segs);
 
         farBalePoints = (new ArrayList<Point>(balePointsSorted.keySet())).subList(index, num_bales);
-        System.out.println("num far bales (farBalePoints.size()) = " + farBalePoints.size());
+        //System.out.println("num far bales (farBalePoints.size()) = " + farBalePoints.size());
 
         closeBales = (new ArrayList<Point>(balePointsSorted.keySet())).subList(0, index);
-        System.out.println("num close bales (closeBales.size()) = " + closeBales.size());
+        //System.out.println("num close bales (closeBales.size()) = " + closeBales.size());
 
         copy_bales = new ArrayList<Point>();
         for(int i=0;i<farBalePoints.size();i++)
@@ -357,34 +357,54 @@ public class Player implements sunshine.sim.Player {
 
         // create the eleventhBale list
         eleventhBale = new HashMap<Integer, Point>();
-        Point closestP = new Point(0.0, 0.0);
-        double p_dist = 0.0;
         for (int seg_i : segments.keySet()) {
-            double min_dist = Double.POSITIVE_INFINITY;
-            for (Point p : segments.get(seg_i)) {
-                p_dist = Math.hypot(p.x - 0.0, p.y - 0.0);
-                if (p_dist < min_dist) {
-                    min_dist = p_dist;
-                    closestP = p;
+            Point mid_p = new Point(0.0, 0.0);
+
+            Point cluster_c = getClusterCenter(segments.get(seg_i));
+            
+            if (cluster_c == null) {
+                //System.out.println("seg " + seg_i + " has no cluster center...find point closest to barn");
+                double p_dist = 0.0;
+                double min_dist = Double.POSITIVE_INFINITY;
+                for (Point p : segments.get(seg_i)) {
+                    p_dist = Math.hypot(p.x - 0.0, p.y - 0.0);
+                    if (p_dist < min_dist) {
+                        min_dist = p_dist;
+                        mid_p = p;
+                    }
+                }
+            } else {
+                //find the bale closest to the cluster center
+                //System.out.println("seg " + seg_i + " has cluster center! find closest bale");
+                double p_dist = 0.0;
+                double min_dist = Double.POSITIVE_INFINITY;
+                for (Point p : segments.get(seg_i)) {
+                    p_dist = Math.hypot(p.x - cluster_c.x, p.y - cluster_c.y);
+                    if (p_dist < min_dist) {
+                        min_dist = p_dist;
+                        mid_p = p;
+                    }
                 }
             }
-            segments.get(seg_i).remove(closestP);
-            eleventhBale.put(seg_i, closestP);
+
+            segments.get(seg_i).remove(mid_p);
+            eleventhBale.put(seg_i, mid_p);
             this.dropPointsToDo.add(seg_i);
         }
-        
-        System.out.println("eleventhBale list:");
+
+        /*System.out.println("eleventhBale list:");
         for (int seg_i : eleventhBale.keySet()) {
             System.out.println("seg " + seg_i + ": (" + eleventhBale.get(seg_i).x + ", " + eleventhBale.get(seg_i).y + ")");
         }
         int count = 0;
         for (int i : segments.keySet()) {
-            //System.out.println("seg " + i + " number of bales: " + segments.get(i).size());
+            System.out.println("seg " + i + " number of bales: " + segments.get(i).size());
             count += segments.get(i).size();
         }
-        // System.out.println("check numFarBales: " + (count + eleventhBale.size()));
+        System.out.println("check numFarBales: " + (count + eleventhBale.size()));
 
-        System.out.println("size of segments:" + segments.size());
+        System.out.println("size of segments:" + segments.size());*/
+
 
         // add tractors into away_tractor and close_tractor list
         for (int i = 0; i < n; i++) {
